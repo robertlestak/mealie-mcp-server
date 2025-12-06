@@ -364,6 +364,26 @@ def register_recipe_tools(mcp: FastMCP, mealie: MealieFetcher) -> None:
             raise ToolError(error_msg)
 
     @mcp.tool()
+    def test_scrape_recipe_url(url: str, use_openai: bool = False) -> Dict[str, Any]:
+        """Test scraping a recipe from a URL without creating it.
+
+        Args:
+            url: URL to test scraping from
+            use_openai: Whether to use OpenAI for scraping
+
+        Returns:
+            Dict[str, Any]: Scraped recipe data preview
+        """
+        try:
+            logger.info({"message": "Testing recipe scrape from URL", "url": url})
+            return mealie.test_scrape_url(url, use_openai)
+        except Exception as e:
+            error_msg = f"Error testing scrape from URL '{url}': {str(e)}"
+            logger.error({"message": error_msg})
+            logger.debug({"message": "Error traceback", "traceback": traceback.format_exc()})
+            raise ToolError(error_msg)
+
+    @mcp.tool()
     def create_recipe_from_url(url: str, include_tags: bool = False) -> str:
         """Create a recipe by scraping from a URL.
 

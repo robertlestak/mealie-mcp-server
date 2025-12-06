@@ -115,6 +115,20 @@ class RecipeMixin:
         logger.info({"message": "Creating new recipe", "name": name})
         return self._handle_request("POST", "/api/recipes", json={"name": name})
 
+    def test_scrape_url(self, url: str, use_openai: bool = False) -> Dict[str, Any]:
+        """Test scraping a URL without creating a recipe
+
+        Args:
+            url: URL to test scraping from
+            use_openai: Whether to use OpenAI for scraping
+
+        Returns:
+            JSON response with scraped recipe data
+        """
+        payload = {"url": url, "useOpenAI": use_openai}
+        logger.info({"message": "Testing recipe scrape from URL", "url": url})
+        return self._handle_request("POST", "/api/recipes/test-scrape-url", json=payload)
+
     def create_recipe_from_url(self, url: str, include_tags: bool = False) -> str:
         """Create a recipe by scraping from a URL
 
