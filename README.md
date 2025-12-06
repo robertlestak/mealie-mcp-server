@@ -47,7 +47,16 @@ Install the server directly with the `fastmcp` command:
 ```bash
 fastmcp install src/server.py \
   --env-var MEALIE_BASE_URL=https://your-mealie-instance.com \
-  --env-var MEALIE_API_KEY=your-mealie-api-key
+  --env-var MEALIE_API_KEY=your-mealie-api-key \
+  --env-var MCP_TRANSPORT=stdio
+```
+
+For HTTP transport:
+```bash
+fastmcp install src/server.py \
+  --env-var MEALIE_BASE_URL=https://your-mealie-instance.com \
+  --env-var MEALIE_API_KEY=your-mealie-api-key \
+  --env-var MCP_TRANSPORT=http
 ```
 
 #### Option 2: Manual Configuration

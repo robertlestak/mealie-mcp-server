@@ -3,7 +3,7 @@ import os
 import traceback
 
 from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 from mealie import MealieFetcher
 from prompts import register_prompts
@@ -48,8 +48,12 @@ register_all_tools(mcp, mealie)
 
 if __name__ == "__main__":
     try:
-        logger.info({"message": "Starting Mealie MCP Server"})
-        mcp.run(transport="stdio")
+        transport = os.getenv("MCP_TRANSPORT", "stdio")
+        logger.info({"message": "Starting Mealie MCP Server", "transport": transport})
+        if transport == "http":
+            mcp.run(transport="http", host="0.0.0.0", port=8000)
+        else:
+            mcp.run(transport=transport)
     except Exception as e:
         logger.critical(
             {"message": "Fatal error in Mealie MCP Server", "error": str(e)}
