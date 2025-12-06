@@ -115,6 +115,66 @@ class RecipeMixin:
         logger.info({"message": "Creating new recipe", "name": name})
         return self._handle_request("POST", "/api/recipes", json={"name": name})
 
+    def create_recipe_from_url(self, url: str, include_tags: bool = False) -> str:
+        """Create a recipe by scraping from a URL
+
+        Args:
+            url: URL to scrape recipe from
+            include_tags: Whether to include tags from the source
+
+        Returns:
+            Slug of the newly created recipe
+        """
+        payload = {"url": url, "includeTags": include_tags}
+        logger.info({"message": "Creating recipe from URL", "url": url})
+        return self._handle_request("POST", "/api/recipes/create/url", json=payload)
+
+    def create_recipe_from_html_or_json(self, data: str, include_tags: bool = False) -> str:
+        """Create a recipe from HTML or JSON data
+
+        Args:
+            data: Raw HTML or schema.org/Recipe JSON string
+            include_tags: Whether to include tags from the source
+
+        Returns:
+            Slug of the newly created recipe
+        """
+        payload = {"data": data, "includeTags": include_tags}
+        logger.info({"message": "Creating recipe from HTML or JSON"})
+        return self._handle_request("POST", "/api/recipes/create/html-or-json", json=payload)
+
+    def create_recipe_from_zip(self, zip_data: bytes, filename: str) -> Dict[str, Any]:
+        """Create recipe(s) from a zip file
+
+        Args:
+            zip_data: Binary zip file data
+            filename: Name of the zip file
+
+        Returns:
+            JSON response with import results
+        """
+        files = {"archive": (filename, zip_data, "application/zip")}
+        logger.info({"message": "Creating recipe from zip", "filename": filename})
+        return self._handle_request("POST", "/api/recipes/create/zip", files=files)
+
+    def create_recipe_from_image(self, image_data: bytes, filename: str, translate_language: str = None) -> str:
+        """Create a recipe from an image using OpenAI
+
+        Args:
+            image_data: Binary image data
+            filename: Name of the image file
+            translate_language: Optional language code to translate recipe to
+
+        Returns:
+            Slug of the newly created recipe
+        """
+        files = {"images": (filename, image_data)}
+        params = {}
+        if translate_language:
+            params["translateLanguage"] = translate_language
+        logger.info({"message": "Creating recipe from image", "filename": filename})
+        return self._handle_request("POST", "/api/recipes/create/image", files=files, params=params)
+
     def patch_recipe(self, slug: str, recipe_data: Dict[str, Any]) -> Dict[str, Any]:
         """Partially update a recipe (only updates provided fields)
 

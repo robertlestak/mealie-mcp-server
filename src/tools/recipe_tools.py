@@ -364,6 +364,76 @@ def register_recipe_tools(mcp: FastMCP, mealie: MealieFetcher) -> None:
             raise ToolError(error_msg)
 
     @mcp.tool()
+    def create_recipe_from_url(url: str, include_tags: bool = False) -> str:
+        """Create a recipe by scraping from a URL.
+
+        Args:
+            url: URL to scrape recipe from
+            include_tags: Whether to include tags from the source
+
+        Returns:
+            str: Slug of the newly created recipe
+        """
+        try:
+            logger.info({"message": "Creating recipe from URL", "url": url})
+            return mealie.create_recipe_from_url(url, include_tags)
+        except Exception as e:
+            error_msg = f"Error creating recipe from URL '{url}': {str(e)}"
+            logger.error({"message": error_msg})
+            logger.debug({"message": "Error traceback", "traceback": traceback.format_exc()})
+            raise ToolError(error_msg)
+
+    @mcp.tool()
+    def create_recipe_from_html_or_json(data: str, include_tags: bool = False) -> str:
+        """Create a recipe from HTML or schema.org/Recipe JSON string.
+
+        Args:
+            data: Raw HTML or schema.org/Recipe JSON string
+            include_tags: Whether to include tags from the source
+
+        Returns:
+            str: Slug of the newly created recipe
+        """
+        try:
+            logger.info({"message": "Creating recipe from HTML or JSON"})
+            return mealie.create_recipe_from_html_or_json(data, include_tags)
+        except Exception as e:
+            error_msg = f"Error creating recipe from HTML/JSON: {str(e)}"
+            logger.error({"message": error_msg})
+            logger.debug({"message": "Error traceback", "traceback": traceback.format_exc()})
+            raise ToolError(error_msg)
+
+    @mcp.tool()
+    def create_recipe_from_image(image_path: str, translate_language: str = None) -> str:
+        """Create a recipe from an image using OpenAI.
+
+        Args:
+            image_path: Local file path to the image
+            translate_language: Optional language code to translate recipe to
+
+        Returns:
+            str: Slug of the newly created recipe
+        """
+        try:
+            import os
+
+            logger.info({"message": "Creating recipe from image", "path": image_path})
+
+            if not os.path.exists(image_path):
+                raise ValueError(f"Image file not found: {image_path}")
+
+            with open(image_path, "rb") as f:
+                image_data = f.read()
+
+            filename = os.path.basename(image_path)
+            return mealie.create_recipe_from_image(image_data, filename, translate_language)
+        except Exception as e:
+            error_msg = f"Error creating recipe from image: {str(e)}"
+            logger.error({"message": error_msg})
+            logger.debug({"message": "Error traceback", "traceback": traceback.format_exc()})
+            raise ToolError(error_msg)
+
+    @mcp.tool()
     def delete_recipe(slug: str) -> Dict[str, Any]:
         """Delete a recipe permanently.
 
